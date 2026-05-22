@@ -1,199 +1,24 @@
 const express = require("express");
 const cors = require("cors");
-const mysql = require("mysql2");
+
+console.log("1. EXPRESS IMPORTADO");
 
 const app = express();
-
-/* =========================
-   CONFIGURACION
-========================= */
 
 app.use(cors());
 app.use(express.json());
 
-/* =========================
-   MYSQL RAILWAY
-========================= */
-
-const db = mysql.createPool({
-  uri: process.env.DATABASE_URL,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-}).promise();
-
-console.log("Pool MySQL iniciado");
+console.log("2. MIDDLEWARE OK");
 
 /* =========================
-   RUTA PRINCIPAL
+   RUTA SIMPLE
 ========================= */
 
 app.get("/", (req, res) => {
   res.send("Servidor funcionando");
 });
 
-/* =========================
-   OBTENER INGRESOS
-========================= */
-
-app.get("/income", async (req, res) => {
-
-  try {
-
-    const [result] = await db.query(
-      "SELECT * FROM income ORDER BY id DESC"
-    );
-
-    res.json(result);
-
-  } catch (err) {
-
-    console.log("ERROR SQL:");
-    console.log(err);
-
-    res.status(500).json(err);
-
-  }
-
-});
-
-/* =========================
-   CREAR INGRESO
-========================= */
-
-app.post("/income", async (req, res) => {
-
-  try {
-
-    const { client, route, value, date } = req.body;
-
-    await db.query(
-      `
-      INSERT INTO income (client, route, value, date)
-      VALUES (?, ?, ?, ?)
-      `,
-      [client, route, value, date]
-    );
-
-    res.send("Ingreso guardado correctamente");
-
-  } catch (err) {
-
-    console.log(err);
-
-    res.status(500).json(err);
-
-  }
-
-});
-
-/* =========================
-   ELIMINAR INGRESO
-========================= */
-
-app.delete("/income/:id", async (req, res) => {
-
-  try {
-
-    const { id } = req.params;
-
-    await db.query(
-      "DELETE FROM income WHERE id = ?",
-      [id]
-    );
-
-    res.send("Ingreso eliminado");
-
-  } catch (err) {
-
-    console.log(err);
-
-    res.status(500).json(err);
-
-  }
-
-});
-
-/* =========================
-   OBTENER GASTOS
-========================= */
-
-app.get("/expenses", async (req, res) => {
-
-  try {
-
-    const [result] = await db.query(
-      "SELECT * FROM expenses ORDER BY id DESC"
-    );
-
-    res.json(result);
-
-  } catch (err) {
-
-    console.log(err);
-
-    res.status(500).json(err);
-
-  }
-
-});
-
-/* =========================
-   CREAR GASTO
-========================= */
-
-app.post("/expenses", async (req, res) => {
-
-  try {
-
-    const { type, description, value, date } = req.body;
-
-    await db.query(
-      `
-      INSERT INTO expenses (type, description, value, date)
-      VALUES (?, ?, ?, ?)
-      `,
-      [type, description, value, date]
-    );
-
-    res.send("Gasto guardado correctamente");
-
-  } catch (err) {
-
-    console.log(err);
-
-    res.status(500).json(err);
-
-  }
-
-});
-
-/* =========================
-   ELIMINAR GASTO
-========================= */
-
-app.delete("/expenses/:id", async (req, res) => {
-
-  try {
-
-    const { id } = req.params;
-
-    await db.query(
-      "DELETE FROM expenses WHERE id = ?",
-      [id]
-    );
-
-    res.send("Gasto eliminado");
-
-  } catch (err) {
-
-    console.log(err);
-
-    res.status(500).json(err);
-
-  }
-
-});
+console.log("3. RUTA OK");
 
 /* =========================
    PUERTO
@@ -202,5 +27,5 @@ app.delete("/expenses/:id", async (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
+  console.log(`4. Servidor corriendo en puerto ${PORT}`);
 });
