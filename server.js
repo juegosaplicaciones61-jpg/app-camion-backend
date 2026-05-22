@@ -1,11 +1,117 @@
 const express = require("express");
 const cors = require("cors");
 const db = require("./db");
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+/* =========================
+   OBTENER INGRESOS
+========================= */
+
+app.get("/income", (req, res) => {
+
+  db.query("SELECT 1", (err, result) => {
+
+    if (err) {
+
+      console.log("ERROR SQL:");
+      console.log(err);
+
+      res.status(500).json(err);
+
+    } else {
+
+      console.log("CONEXION OK");
+
+      res.json(result);
+
+    }
+
+  });
+
+});
+
+/* =========================
+   CREAR INGRESO
+========================= */
+
 app.post("/income", (req, res) => {
+
+  const { client, route, value, date } = req.body;
+
+  const sql = `
+    INSERT INTO income (client, route, value, date)
+    VALUES (?, ?, ?, ?)
+  `;
+
+  db.query(
+    sql,
+    [client, route, value, date],
+    (err, result) => {
+
+      if (err) {
+        console.log(err);
+        res.status(500).send("Error guardando ingreso");
+      } else {
+        res.send("Ingreso guardado correctamente");
+      }
+
+    }
+  );
+
+});
+
+/* =========================
+   ELIMINAR INGRESO
+========================= */
+
+app.delete("/income/:id", (req, res) => {
+
+  const { id } = req.params;
+
+  const sql = "DELETE FROM income WHERE id = ?";
+
+  db.query(sql, [id], (err, result) => {
+
+    if (err) {
+      console.log(err);
+      res.status(500).send("Error eliminando ingreso");
+    } else {
+      res.send("Ingreso eliminado");
+    }
+
+  });
+
+});
+
+/* =========================
+   OBTENER GASTOS
+========================= */
+
+app.get("/expenses", (req, res) => {
+
+  const sql = "SELECT * FROM expenses ORDER BY id DESC";
+
+  db.query(sql, (err, result) => {
+
+    if (err) {
+      console.log(err);
+      res.status(500).send("Error obteniendo gastos");
+    } else {
+      res.json(result);
+    }
+
+  });
+
+});
+
+/* =========================
+   CREAR GASTO
+========================= */
+
 app.post("/expenses", (req, res) => {
 
   const { type, description, value, date } = req.body;
@@ -31,27 +137,27 @@ app.post("/expenses", (req, res) => {
   );
 
 });
-  const { client, route, value, date } = req.body;
 
-  const sql = `
-    INSERT INTO income (client, route, value, date)
-    VALUES (?, ?, ?, ?)
-  `;
+/* =========================
+   ELIMINAR GASTO
+========================= */
 
-  db.query(
-    sql,
-    [client, route, value, date],
-    (err, result) => {
+app.delete("/expenses/:id", (req, res) => {
 
-      if (err) {
-        console.log(err);
-        res.status(500).send("Error guardando ingreso");
-      } else {
-        res.send("Ingreso guardado correctamente");
-      }
+  const { id } = req.params;
 
+  const sql = "DELETE FROM expenses WHERE id = ?";
+
+  db.query(sql, [id], (err, result) => {
+
+    if (err) {
+      console.log(err);
+      res.status(500).send("Error eliminando gasto");
+    } else {
+      res.send("Gasto eliminado");
     }
-  );
+
+  });
 
 });
 
